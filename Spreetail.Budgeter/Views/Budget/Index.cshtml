@@ -1,0 +1,333 @@
+﻿@model Spreetail.Budgeter.ViewModels.Budget.BudgetViewModel
+
+
+<h1>@Model.Name</h1>
+
+<h4>Budget for @Model.BudgetDate.ToString("MMMM yyyy")</h4>
+
+<br />
+
+@Html.HiddenFor(x => x.BudgetID, new { id = "budget-id" })
+@Html.HiddenFor(x => x.BudgetDate, new { id = "budget-date" })
+
+<div id="no-categories" class="alert-danger" style="display:none;margin-bottom:15px;">
+    Please create a category first.
+</div>
+<div>
+    <button type="button" class="btn btn-primary" id="add-a-cat" data-toggle="modal" data-target="#cat-input-modal">Add a Category</button>
+    <button type="button" class="btn btn-primary" id="add-an-item">Add an Item</button>
+</div>
+
+@Html.Partial("_CategoryInput")
+
+@Html.Partial("_PurchaseSummaryPrompt")
+
+@Html.Partial("_ItemInput")
+
+@Html.Partial("_DeletePrompt")
+
+<div id="spending-records">
+    @if (Model.Items?.Count > 0) {
+        for (int i = 0; i < Model.Items.Count; i++) {
+            @Html.Partial("_CategorySpending", Model.Items[i]);
+        }
+    }
+</div>
+
+@{
+    var nextMonth = Url.Action("Index", "Budget", new { ID = Model.BudgetID, month = Model.BudgetDate.AddMonths(1).Month, year = Model.BudgetDate.AddMonths(1).Year });
+    var prevMonth = Url.Action("Index", "Budget", new { ID = Model.BudgetID, month = Model.BudgetDate.AddMonths(-1).Month, year = Model.BudgetDate.AddMonths(-1).Year });
+}
+
+<br /><br />
+<button class="btn btn-default" id="purchase-sum-prompt">View Your Spending Summary</button>
+
+<br /><br />
+<div>
+    <a class="btn btn-primary" href="@prevMonth">Previous Month</a>
+    <a class="btn btn-primary" href="@nextMonth">Next Month</a>
+</div>
+
+
+@section scripts{
+    <script>
+    var PURCHASE_SUM_URL = '@Url.Action("PurchaseSummary", "Budget")';
+
+        $("#purchase-sum-prompt").click(() => {
+            $("#purchase-sum-modal").modal("show");
+        });
+
+        $("#purchase-sum-go").click(() => {
+            window.location = PURCHASE_SUM_URL + "/"+ BudgetID() +"?startdate=" + $("#ps-start-date").val() + "&enddate=" + $("#ps-end-date").val();
+        });
+    </script>
+
+    <script>
+        var CATEGORY_SPENDING_GET = '@Url.Action("GetCategorySpendingHTML", "Budget")';
+        var CATEGORY_SAVE = '@Url.Action("SaveCategory", "Budget")';
+        var CATEGORY_GET_ALL = '@Url.Action("GetAllCategories", "Budget")';
+
+        var ITEM_SAVE = '@Url.Action("SaveItem", "Budget")';
+        var ITEM_DELETE = '@Url.Action("DeleteItem", "Budget")';
+
+        var REOCCURING_SAVE = '@Url.Action("SaveReoccuringItem", "Budget")';
+        var REOCCURING_GET = '@Url.Action("GetReoccuringItem", "Budget")';
+
+        var DISPLAY_DATE = '@Model.BudgetDate.ToString("yyyy-MM-dd")';
+
+
+        $(function () {
+            LoadCategoryDropDown();
+
+            clearItemInput();
+        });
+
+
+        function BudgetDate() {
+            return $('#budget-date').val();
+        }
+        function BudgetID() {
+            return $('#budget-id').val();
+        }
+
+        $("#item-close").click(() => {
+            clearItemInput();
+        });
+
+        //category save---
+        $("#cat-submit").click(() => {
+             var model = { @nameof(Spreetail.Budgeter.Models.Category.CategoryID) : $('#cat-id').val(),
+                          @nameof(Spreetail.Budgeter.Models.Category.CategoryName) : $('#cat-input').val(),
+                          @nameof(Spreetail.Budgeter.Models.Category.BudgetID) : BudgetID(),
+                          @nameof(Spreetail.Budgeter.Models.Category.BudgetAmount) : $("#cat-amount").val()};
+
+
+            $.post(CATEGORY_SAVE, model, function (res) {
+                        console.log(res);
+
+                        if (res.Errors.length > 0) {
+                    $("#cat-errors").html("");
+                    $.each(res.Errors, (i, e) => {
+                        $("#cat-errors").append($("<div>").addClass("alert-danger").html(e));
+                      });
+
+                        } else {
+                    $("#no-categories").hide();
+                            clearCategory();
+                            LoadCategoryDropDown();
+                            ReloadCategory(res.CategoryID);
+                    $('#cat-input-modal').modal('hide');
+                        }
+                    });
+                });
+
+        function clearCategory() {
+            $('#cat-id').val("");
+            $('#cat-input').val("");
+            $("#cat-errors").html("");
+            $("#cat-amount").val("");
+                }
+
+        $("#add-an-item").click(() => {
+                    if ($("#category-select option").length > 0) {
+                $("#item-input-modal").modal('show');
+                    } else {
+                $("#no-categories").show();
+                    }
+        });
+
+        //enable / disable reoccuring rate entry
+        $('#item-reoccuring').click(() => {
+                    if ($('#item-reoccuring').is(":checked")) {
+                $("#item-reoccuring-options").prop("disabled", false);
+                    } else {
+                $("#item-reoccuring-options").prop("disabled", true);
+                    }
+                });
+
+        //items save---
+        $("#item-submit").click(() => {
+                    //save reoccuring
+                    var saveReoccuring = $('#item-reoccuring').is(":checked");
+
+                    if (saveReoccuring) {
+                        var reoccuringmodel = { @nameof(Spreetail.Budgeter.Models.ReoccuringItem.ReoccuringRate) : $('#item-reoccuring-rate').val(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.ReoccuringUnit) : $('#item-reoccuring-unit').val(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.StartDate) : $('#item-date').val(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.EndDate) : $('#reoccuring-end-date').val(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.CategoryID) : $('#category-select').val(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.ReoccuringCost) : $('#item-cost').val(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.BudgetID) : BudgetID(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.Name) : $('#item-name').val(),
+                                     @nameof(Spreetail.Budgeter.Models.ReoccuringItem.ReoccuringItemID) : $('#reoccuring-id').val()       };
+
+                $.post(REOCCURING_SAVE, reoccuringmodel, function (res) {
+
+                        if (res.Errors.length > 0) {
+                                $("#item-errors").html("");
+                                $.each(res.Errors, (i, e) => {
+                                    $("#item-errors").append($("<div>").addClass("alert-danger").html(e));
+                                  });
+
+                        } else {
+                            ReloadCategory($('#category-select').val());
+                                $('#item-input-modal').modal('hide');
+                            clearItemInput();
+                        }
+
+                    });
+                } else {
+                var itemmodel = { @nameof(Spreetail.Budgeter.Models.Item.CategoryID) : $('#category-select').val(),
+                          @nameof(Spreetail.Budgeter.Models.Item.ItemName) : $('#item-name').val(),
+                              @nameof(Spreetail.Budgeter.Models.Item.PurchaseDate) : $('#item-date').val(),
+                            @nameof(Spreetail.Budgeter.Models.Item.Cost) : $('#item-cost').val(),
+                            @nameof(Spreetail.Budgeter.Models.Item.ItemID) : $('#item-id').val(),
+                          @nameof(Spreetail.Budgeter.Models.Item.BudgetID) : BudgetID()};
+                $.post(ITEM_SAVE, itemmodel, function (res) {
+                    if (res.Errors.length > 0) {
+                        $("#item-errors").html("");
+                        $.each(res.Errors, (i, e) => {
+                            $("#item-errors").append($("<div>").addClass("alert-danger").html(e));
+                          });
+
+                    } else {
+                        ReloadCategory($('#category-select').val());
+                        $('#item-input-modal').modal('toggle');
+                        clearItemInput();
+                    }
+                });
+                        }
+        });
+
+        function editItem(idSelector) {
+            clearItemInput();
+
+            var tr = $("#" + idSelector);
+            $('#category-select').val(tr.data("category-id"));
+            $('#item-name').val(tr.data("item-name"));
+            $('#item-date').val(tr.data("purchase-date"));
+            $('#item-cost').val(tr.data("cost"));
+            $('#item-id').val(tr.data("id"));
+            $('#item-input-modal').modal('show');
+            $('#reoccuring-id').val(tr.data("reoccuring-id"));
+
+            console.log(tr.data("reoccuring-id"));
+
+            if (tr.data("reoccuring-id") > 0) {
+                var model = { id: tr.data("reoccuring-id") };
+                $.post(REOCCURING_GET, model, function (res) {
+                    $("#reoccuring-warning").show();
+                    $("#item-reoccuring-rate").val(res.ReoccuringRate);
+                    $("#item-reoccuring-unit").val(res.ReoccuringUnit);
+                    
+                    var endDate = new Date(parseInt(res.EndDate.replace(/[^0-9 +]/g, '')));
+                    var monthPlaceholder = "";
+                    if ((endDate.getMonth() + 1).toString().length == 1) {
+                        monthPlaceholder = "0";
+                    }
+                    var dayPlaceholder = "";
+                    if (endDate.getDay().toString().length == 1) {
+                        dayPlaceholder = "0";
+                    }
+                    var setDate = endDate.getFullYear() + "-" + monthPlaceholder + (endDate.getMonth() + 1) + "-" + dayPlaceholder + endDate.getDay();
+                    $("#reoccuring-end-date").val(setDate);
+                    $("#item-reoccuring").prop("checked", true);
+                    $("#item-reoccuring").prop("disabled", true);
+                    $("#item-reoccuring-options").prop("disabled", false);
+
+            });
+        }
+        }
+
+        function deleteItemPrompt(idSelector) {
+            clearItemInput();
+
+            var tr = $("#" + idSelector);
+
+            $('#item-del-id').val(tr.data("id"));
+            $('#reoccuring-del-id').val(tr.data("reoccuring-id"));
+            $('#category-del-id').val(tr.data("category-id"));
+
+            $('#item-delete-modal').modal("show");
+
+            if (tr.data("occuring-id") > 0) {
+                $("#reoccuring-warning").show();
+            }
+        }
+
+        $("#item-del").click(() => {
+            var model = { itemID: $('#item-del-id').val(), reoccuringID: $('#reoccuring-del-id').val() }
+            $.post(ITEM_DELETE, model, function (res) {
+            ReloadCategory($('#category-del-id').val());
+                $('#item-delete-modal').modal("hide");
+                $("#reoccuring-warning").hide();
+
+        });
+
+        });
+
+        function clearItemInput() {
+            $("#item-errors").html("");
+            $("#item-name").val("");
+            $("#item-cost").val("");
+            $("#item-date").val(DISPLAY_DATE);
+            $("#category-select").val("");
+            $("#item-reoccuring").val("");
+            $("#item-reoccuring-rate").val("");
+            $("#item-reoccuring-unit").val("");
+            $("#reoccuring-end-date").val(DISPLAY_DATE);
+            $("#reoccuring-warning").hide();
+            $("#item-reoccuring").prop("checked", false);
+            $("#item-reoccuring-options").prop("disabled", true);
+            $("#item-id").val("");
+            $("#reoccuring-id").val("");
+
+        }
+
+        function LoadCategoryDropDown() {
+            var model = { budgetID: BudgetID};
+        var catSelect = $("#category-select");
+
+            $.post(CATEGORY_GET_ALL, model, function (res) {
+            console.log(res);
+            catSelect.empty();
+                $(res).each(function() {
+                catSelect.append($("<option>").attr("value", this.CategoryID).html(this.CategoryName));
+            });
+        });
+        }
+
+        function SaveItem(model) {
+            $.post(ITEM_SAVE, model, function (res) {
+                //res contains the markup returned by the partial view
+                //You probably want to set that to some Div.
+                console.log(res);
+
+                if (res.CategoryID > 0) {
+                    ReloadCategory(res.CategoryID);
+                }
+            });
+
+        }
+
+        function ReloadCategory(id) {
+            var model = { ID : id };
+            $.post(CATEGORY_SPENDING_GET, { ID: id, date: BudgetDate() }, function (res) {
+            console.log(res);
+            var category = CategoryDiv(id);
+            if (category.length > 0) {
+                category.html(res);
+            } else {
+                    $("#spending-records").append(res);
+            }
+        });
+        }
+
+
+        function CategoryDiv(id) {
+            return $('#category-spending-' + id);
+        }
+
+
+    </script>
+}

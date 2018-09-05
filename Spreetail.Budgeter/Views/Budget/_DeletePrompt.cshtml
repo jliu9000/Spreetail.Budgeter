@@ -1,0 +1,35 @@
+﻿
+
+<div id="item-delete-modal" tabindex="-1" class="modal fade" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete a Budget Item</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="item-errors" class="form-group"></div>
+                <div id="reoccuring-warning" class="alert-warning" style="display:none;" class="form-group">
+                    Deleting this reoccuring charge will delete all assosicated budget items.
+                </div>
+
+                <input type="hidden" id="item-del-id" />
+                <input type="hidden" id="reoccuring-del-id" />
+                <input type="hidden" id="category-del-id" />
+                <div>
+                    Are you sure you wish to delete this budget item?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="item-del" class="btn btn-primary">Delete</button>
+                    <button type="button" id="item-del-close" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>

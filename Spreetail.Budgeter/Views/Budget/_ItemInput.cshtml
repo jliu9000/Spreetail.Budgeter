@@ -1,0 +1,79 @@
+﻿
+
+<div id="item-input-modal" tabindex="-1" class="modal fade" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add a Budget Item</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="item-errors" class="form-group"></div>
+                <div id="reoccuring-warning" class="alert-warning" style="display:none;" class="form-group">
+                    You are editting an reoccuring charge.  Any changes will be made to all existing 
+                    budget items tied to this charge.  Deleting this reoccuring charge will delete all assosicated budget items.
+                    <br />
+                </div>
+
+                <input type="hidden" id="item-id" />
+                <input type="hidden" id="reoccuring-id" />
+
+                <div class="form-group">
+                    <label for="item-name">Name</label>
+                    <input id="item-name" class="form-control" type="text" />
+                </div>
+                <div class="form-group">
+                    <label for="item-cost">Amount</label>
+                    <input id="item-cost" class="form-control" type="number" />
+                </div>
+                <div class="form-group">
+                    <label for="item-date">Purchase Date</label>
+                    <input id="item-date" class="form-control" type="date" />
+                </div>
+                <div class="form-group">
+                    <label for="category-select">Category</label>
+                    <select id="category-select" class="form-control"></select>
+                </div>
+                <br /><br />
+                <div class="form-group">
+                    <label for="item-reoccuring">
+                    <input id="item-reoccuring" type="checkbox" />
+                    Reoccuring Charge?</label>
+                </div>
+                <fieldset id="item-reoccuring-options" disabled>
+                    <div class="form-group">
+                        <label>Every</label>
+
+                        <select id="item-reoccuring-rate" class="form-control" style="display:inline;width:15%;min-width:75px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                        <select id="item-reoccuring-unit" class="form-control" style="display:inline;width:30%;min-width:130px;">
+                            
+                            <option value="@((int)Spreetail.Budgeter.Models.ReoccuringItem.eReoccuringUnit.Week)">Weeks(s)</option>
+                            <option value="@((int)Spreetail.Budgeter.Models.ReoccuringItem.eReoccuringUnit.Month)">Month(s)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ending</label>
+                        <input id="reoccuring-end-date" type="date" class="form-control" />
+                    </div>
+                </fieldset>
+
+                <div class="modal-footer">
+                    <button type="button" id="item-submit" class="btn btn-primary">Save</button>
+                    <button type="button" id="item-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>

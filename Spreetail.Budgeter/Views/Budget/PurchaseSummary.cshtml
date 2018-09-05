@@ -1,0 +1,68 @@
+﻿@model Spreetail.Budgeter.ViewModels.Budget.PurchaseSummary
+
+
+<h1>@Model.Name</h1>
+
+<h4>Spending for @Model.StartDate.ToString("MMMM d, yyyy") to @Model.EndDate.ToString("MMMM d, yyyy")</h4>
+
+@Html.HiddenFor(x => x.BudgetID, new { id = "budget-id" })
+@Html.Partial("_PurchaseSummaryPrompt")
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Purchase Date</th>
+            <th scope="col">Name</th>
+            <th scope="col">Cost</th>
+            <th scope="col">Reoccuring?</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items) {
+            <tr>
+                <td class="col">@Model.CategoryNames[item.CategoryID]</td>
+                <td class="col purchase-date">@item.PurchaseDate.ToString("M/d/yy")</td>
+                <td class="col item-name">@item.ItemName</td>
+                <td class="col item-cost">@item.Cost.ToString("C")</td>
+                <td class="col reoccuring @(item.ReoccuringItemID > 0 ? "font-weight-bold" : "")">@(item.ReoccuringItemID > 0 ? "yes" : "no")</td>
+            </tr>
+
+
+        }
+        <tr>
+            <td class="col"></td>
+            <td class="col"></td>
+            <td class="col text-left">Total Spent:</td>
+            <td class="col alert-info">@Model.TotalSpent.ToString("C")</td>
+            <td class="col"></td>
+            <td class="col"></td>
+        </tr>
+
+
+    </tbody>
+</table>
+
+
+<br /><br />
+<button class="btn btn-default" id="purchase-sum-prompt">Select a Different Date Range</button>
+<br /><br />
+<a href="@Url.Action("Index", "Budget", new { ID = Model.BudgetID })" class="btn btn-primary">Back to Monthly Budget</a>
+
+@section scripts{
+    <script>
+    var PURCHASE_SUM_URL = '@Url.Action("PurchaseSummary", "Budget")';
+
+    $("#purchase-sum-prompt").click(() => {
+        $("#purchase-sum-modal").modal("show");
+    });
+
+    $("#purchase-sum-go").click(() => {
+        window.location = PURCHASE_SUM_URL + "?startdate=" + $("#ps-start-date").val() + "&enddate=" + $("#ps-end-date").val();
+
+
+
+    });
+    </script>
+ }

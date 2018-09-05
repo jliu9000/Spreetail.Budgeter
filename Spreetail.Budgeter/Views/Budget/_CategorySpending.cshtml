@@ -1,0 +1,64 @@
+﻿@model Spreetail.Budgeter.ViewModels.Budget.ItemsByCategory
+
+
+<div id="category-spending-@Model.CategoryID">
+    <h2>@Model.CategoryName</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Purchase Date</th>
+                <th scope="col">Name</th>
+                <th scope="col">Cost</th>
+                <th scope="col">Reoccuring?</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items) {
+                <tr id="item-model-@item.ItemID"
+                    data-id="@item.ItemID"
+                    data-reoccuring-id="@item.ReoccuringItemID"
+                    data-purchase-date="@item.PurchaseDate.ToString("yyyy-MM-dd")"
+                    data-item-name="@item.ItemName"
+                    data-cost="@item.Cost"
+                    data-category-id="@item.CategoryID">
+                    <td class="col purchase-date">@item.PurchaseDate.ToString("M/d/yy")</td>
+                    <td class="col item-name">@item.ItemName</td>
+                    <td class="col item-cost">@item.Cost.ToString("C")</td>
+                    <td class="col reoccuring @(item.ReoccuringItemID > 0 ? "font-weight-bold" : "")">@(item.ReoccuringItemID > 0 ? "yes" : "no")</td>
+                    <td class="col">
+                        <button class="btn-sm btn" onclick="editItem('item-model-@item.ItemID');">edit</button>
+                        <button class="btn-sm btn red" onclick="deleteItemPrompt('item-model-@item.ItemID');">delete</button>
+                    </td>
+                </tr>
+
+
+            }
+            <tr>
+                <td class="col"></td>
+                <td class="col text-left">Total:</td>
+                <td class="col alert-warning">@Model.ItemCostTotal.ToString("C")</td>
+                <td class="col"></td>
+                <td class="col"></td>
+            </tr>
+
+            <tr>
+                <td class="col"></td>
+                <td class="col text-left">Budget:</td>
+                <td class="col alert-info">@Model.BudgetAmount.ToString("C")</td>
+                <td class="col"></td>
+                <td class="col"></td>
+            </tr>
+            <tr>
+                <td class="col"></td>
+                <td class="col text-left">Remaining:</td>
+                <td class="col @(Model.BudgetRemaining > 0 ? "alert-success" : "alert-danger")">@Model.BudgetRemaining.ToString("C")</td>
+                <td class="col"></td>
+                <td class="col"></td>
+
+            </tr>
+        </tbody>
+    </table>
+
+</div>
