@@ -2,4 +2,15 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/Spreetail.Budgeter.Service/bin/Debug/EntityFramework.xml
+
+/packages/
+/.vs/Spreetail.Budgeter
+/Spreetail.Budgeter.Service/obj/Debug
+/Spreetail.Budgeter.Service/bin/Debug
+/Spreetail.Budgeter.Models/obj/Debug
+/Spreetail.Budgeter.Models/bin/Debug
+/Spreetail.Budgeter/obj/Debug
+/Spreetail.Budgeter/bin/Debug
+/Spreetail.Budgeter.Data/obj/Debug
+/Spreetail.Budgeter.Data/bin/Debug
+/Spreetail.Budgeter/bin

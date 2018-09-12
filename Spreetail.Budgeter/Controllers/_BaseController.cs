@@ -4,19 +4,16 @@ using System.Linq;
 
 using System.Web.Mvc;
 
-namespace Spreetail.Budgeter.Controllers {
-    public abstract class _BaseController : Controller {
+namespace Spreetail.Budgeter.Controllers
+{
+    public abstract class _BaseController : Controller
+    {
 
-        private Factory _Factory;
-        internal Factory Factory {
-            get {
-                if (_Factory == null) {
-                    _Factory = new Factory();
-                }
-                return _Factory;
-            }
+        protected List<string> ModelStateErrors()
+        {
+            return ModelState.Values.SelectMany(x => x.Errors.Select(e => e.ErrorMessage)).ToList();
+
         }
-
 
 
     }

@@ -20,7 +20,8 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Items) {
+        @foreach (var item in Model.Items)
+        {
             <tr>
                 <td class="col">@Model.CategoryNames[item.CategoryID]</td>
                 <td class="col purchase-date">@item.PurchaseDate.ToString("M/d/yy")</td>
@@ -54,15 +55,8 @@
     <script>
     var PURCHASE_SUM_URL = '@Url.Action("PurchaseSummary", "Budget")';
 
-    $("#purchase-sum-prompt").click(() => {
-        $("#purchase-sum-modal").modal("show");
-    });
-
-    $("#purchase-sum-go").click(() => {
-        window.location = PURCHASE_SUM_URL + "?startdate=" + $("#ps-start-date").val() + "&enddate=" + $("#ps-end-date").val();
-
-
-
-    });
     </script>
- }
+
+    @Scripts.Render("~/bundles/purchaseprompt")
+
+}
