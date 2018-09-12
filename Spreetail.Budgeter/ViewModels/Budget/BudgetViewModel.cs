@@ -4,11 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 
-using Spreetail.Budgeter.Model;
 namespace Spreetail.Budgeter.ViewModels.Budget {
     public class BudgetViewModel {
         public int BudgetID { get; set; }
-
         public string Name { get; set; }
 
         public DateTime BudgetDate { get; set; }
@@ -18,10 +16,10 @@ namespace Spreetail.Budgeter.ViewModels.Budget {
     }
 
     public class ItemsByCategory {
-        public int CategoryID { get; set; }
-        public string CategoryName { get; set; }
-        public double BudgetAmount { get; set; }
-        public List<Item> Items { get; set; }
+        public int CategoryID;
+        public string CategoryName;
+        public double BudgetAmount;
+        public List<Models.Item> Items;
 
         public double ItemCostTotal {
             get {
@@ -32,7 +30,9 @@ namespace Spreetail.Budgeter.ViewModels.Budget {
             get {
                 return BudgetAmount - ItemCostTotal;
             }
-        }       
+        }
+
+        
 
     }
 }

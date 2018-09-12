@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 
-using Spreetail.Budgeter.Model;
 using AutoMapper;
 
 namespace Spreetail.Budgeter {
@@ -16,17 +15,19 @@ namespace Spreetail.Budgeter {
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            UnityConfig.RegisterComponents();
-
             //automapper settings
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<Budget, ViewModels.Budget.BudgetViewModel>();
-                cfg.CreateMap<Category, ViewModels.Budget.ItemsByCategory>();
-                cfg.CreateMap<ReoccuringItem, Item>()
+                cfg.CreateMap<Models.Budget, ViewModels.Budget.BudgetViewModel>();
+                cfg.CreateMap<Models.Category, ViewModels.Budget.ItemsByCategory>();
+                cfg.CreateMap<Models.ReoccuringItem, Models.Item>()
                     .ForMember(dest => dest.ItemName, opt => opt.MapFrom(src => src.Name))
                         .ForMember(dest => dest.Cost, opt => opt.MapFrom(src => src.ReoccuringCost))
                         .ForMember(dest => dest.ReoccuringItemID, opt => opt.MapFrom(src => src.ReoccuringItemID));
+
+
             });
+            
+
 
         }
 

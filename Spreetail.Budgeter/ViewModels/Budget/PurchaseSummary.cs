@@ -1,5 +1,4 @@
-﻿using Spreetail.Budgeter.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -14,7 +13,7 @@ namespace Spreetail.Budgeter.ViewModels.Budget {
 
         public Dictionary<int, string> CategoryNames;
 
-        public List<Item> Items { get; set; }
+        public List<Models.Item> Items { get; set; }
 
         public double TotalSpent {
             get {
