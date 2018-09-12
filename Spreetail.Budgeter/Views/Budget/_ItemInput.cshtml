@@ -11,14 +11,14 @@
             </div>
             <div class="modal-body">
                 <div id="item-errors" class="form-group"></div>
-                <div id="reoccuring-warning" class="alert-warning" style="display:none;" class="form-group">
+                <div id="reoccuring-warning" class="alert-warning form-group" style="display:none;">
                     You are editting an reoccuring charge.  Any changes will be made to all existing 
                     budget items tied to this charge.  Deleting this reoccuring charge will delete all assosicated budget items.
                     <br />
                 </div>
 
-                <input type="hidden" id="item-id" />
-                <input type="hidden" id="reoccuring-id" />
+                <input type="hidden" id="item-id" value="-1" />
+                <input type="hidden" id="reoccuring-id" value="-1"  />
 
                 <div class="form-group">
                     <label for="item-name">Name</label>
@@ -56,8 +56,8 @@
                         </select>
                         <select id="item-reoccuring-unit" class="form-control" style="display:inline;width:30%;min-width:130px;">
                             
-                            <option value="@((int)Spreetail.Budgeter.Models.ReoccuringItem.eReoccuringUnit.Week)">Weeks(s)</option>
-                            <option value="@((int)Spreetail.Budgeter.Models.ReoccuringItem.eReoccuringUnit.Month)">Month(s)</option>
+                            <option value="@((int)Spreetail.Budgeter.Model.ReoccuringItem.eReoccuringUnit.Week)">Weeks(s)</option>
+                            <option value="@((int)Spreetail.Budgeter.Model.ReoccuringItem.eReoccuringUnit.Month)">Month(s)</option>
                         </select>
                     </div>
                     <div class="form-group">

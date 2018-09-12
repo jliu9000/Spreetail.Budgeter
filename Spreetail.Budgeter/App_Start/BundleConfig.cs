@@ -8,6 +8,12 @@ namespace Spreetail.Budgeter {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/budgetcontrols").Include(
+            "~/Scripts/BudgetControls.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/purchaseprompt").Include(
+            "~/Scripts/PurchasePrompt.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
